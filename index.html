@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Space Runner - Cauê Taddeo</title>
+        <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+        <style>
+            body {
+                margin: 0;
+                background: #000;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                overflow: hidden;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            // Tamanho da tela do jogo
+            const larguraJogo = 1200;
+            const alturaJogo = 800;
+
+            // Cena do Menu
+            class MenuScene extends Phaser.Scene {
+                constructor() {
+                    super('MenuScene'); // Nome da cena
+                }
+
+                // Carrega as imagens do menu
+                preload() {
+                    this.load.image("spacerunner", "assets/spacerunner.png"); // Imagem do título
+                    this.load.image("play", "assets/play.png"); // Botão de play
+                }
+
+                // Cria o menu
+                create() {
+                    // Adiciona a imagem do título no centro da tela
+                    this.add.image(larguraJogo / 2, alturaJogo / 3, "spacerunner").setScale(0.8);
+
+                    // Cria o botão de play
+                    let playButton = this.add.image(larguraJogo / 2, alturaJogo / 2, "play")
+                        .setScale(0.5) // Tamanho do botão
+                        .setInteractive(); // Faz o botão clicável
+
+                    // Quando o botão é clicado, inicia o jogo
+                    playButton.on("pointerdown", () => {
+                        this.scene.start("GameScene"); // Muda para a cena do jogo
+                    });
+                }
+            }
+
+            // Cena do Jogo
+            class GameScene extends Phaser.Scene {
+                constructor() {
+                    super('GameScene'); // Nome da cena
+                }
+
+                // Carrega as imagens e sprites do jogo
+                preload() {
+                    this.load.image("background", "assets/fundo_space.png"); // Fundo do espaço
+                    this.load.spritesheet("player", "assets/astronauta.png", {
+                        frameWidth: 64,
+                        frameHeight: 64,
+                    }); // Sprite do jogador (astronauta)
+                    this.load.image("ground", "assets/chao.png"); // Chão do jogo
+                    this.load.image("meteoro", "assets/meteoro.png"); // Meteoro
+                }
+
+                // Cria o jogo
+                create() {
+                    // Adiciona o fundo do espaço
+                    this.add.image(larguraJogo / 2, alturaJogo / 2, "background").setScale(2);
+
+                    // Cria o chão
+                    this.platforms = this.physics.add.staticGroup(); // Grupo de plataformas (chão)
+                    let ground = this.platforms
+                        .create(larguraJogo / 2, alturaJogo - 20, "ground") // Posição do chão
+                        .setScale(1.5, 0.5) // Aumenta a largura do chão
+                        .refreshBody(); // Atualiza o corpo físico do chão
+
+                    // Ajusta a área de colisão do chão (bounce box menor)
+                    ground.body.setSize(ground.body.width * 0.8, ground.body.height * 0.5).setOffset(ground.body.width * 0.1, ground.body.height * 0.5);
+
+                    // Cria o jogador
+                    this.player = this.physics.add.sprite(larguraJogo / 2, alturaJogo / 2, "player");
+                    this.player.setCollideWorldBounds(true); // Impede que o jogador saia da tela
+                    this.physics.add.collider(this.player, this.platforms); // Faz o jogador colidir com o chão
+
+                    // Pontuação
+                    this.score = 0; // Inicia a pontuação em 0
+                    this.scoreText = this.add.text(16, 16, "Score: " + this.score, { font: "32px Arial", fill: "#fff" }); // Texto da pontuação
+
+                    // Animações do jogador
+                    this.anims.create({
+                        key: "walk", // Nome da animação
+                        frames: this.anims.generateFrameNumbers("player", { start: 1, end: 4 }), // Frames da animação
+                        frameRate: 4, // Velocidade da animação
+                        repeat: -1, // Repete infinitamente
+                    });
+
+                    this.anims.create({
+                        key: "run", // Nome da animação
+                        frames: this.anims.generateFrameNumbers("player", { start: 8, end: 11 }), // Frames da animação
+                        frameRate: 9, // Velocidade da animação
+                        repeat: -1, // Repete infinitamente
+                    });
+
+                    this.player.anims.play("walk"); // Inicia a animação de caminhada
+
+                    // Controles do jogador (teclado)
+                    this.cursors = this.input.keyboard.createCursorKeys();
+
+                    // Cria os meteoros
+                    this.meteorosGroup = this.physics.add.group(); // Grupo de meteoros
+                    this.time.addEvent({
+                        delay: 800, // Tempo entre cada meteoro
+                        callback: this.spawnMeteoro, // Função que cria os meteoros
+                        callbackScope: this,
+                        loop: true, // Repete infinitamente
+                    });
+
+                    // Colisão entre o jogador e os meteoros
+                    this.physics.add.overlap(this.player, this.meteorosGroup, this.hitMeteoro, null, this);
+
+                    // Colisão entre os meteoros e o chão
+                    this.physics.add.collider(this.meteorosGroup, this.platforms, this.meteorHitGround, null, this);
+                }
+
+                // Atualiza o jogo a cada frame
+                update() {
+                    // Movimentação do jogador
+                    if (this.cursors.left.isDown) { // Se a seta para a esquerda estiver pressionada
+                        this.player.setVelocityX(-160); // Move o jogador para a esquerda
+                        this.player.anims.play("run", true); // Toca a animação de correr
+                        this.player.flipX = true; // Vira o jogador para a esquerda
+                    } else if (this.cursors.right.isDown) { // Se a seta para a direita estiver pressionada
+                        this.player.setVelocityX(160); // Move o jogador para a direita
+                        this.player.anims.play("run", true); // Toca a animação de correr
+                        this.player.flipX = false; // Vira o jogador para a direita
+                    } else { // Se nenhuma tecla estiver pressionada
+                        this.player.setVelocityX(0); // Para o jogador
+                        this.player.anims.stop(); // Para a animação
+                    }
+
+                    // Pulo do jogador
+                    if (this.cursors.up.isDown && this.player.body.blocked.down) { // Se a seta para cima estiver pressionada e o jogador estiver no chão
+                        this.player.setVelocityY(-300); // Faz o jogador pular
+                    }
+
+                    // Atualiza o texto da pontuação
+                    this.scoreText.setText("Score: " + this.score);
+                }
+
+                // Cria um meteoro
+                spawnMeteoro() {
+                    let x = Phaser.Math.Between(0, larguraJogo); // Posição aleatória no eixo X
+                    let meteoro = this.meteorosGroup.create(x, 0, "meteoro"); // Cria o meteoro
+                    meteoro.setScale(0.5); // Tamanho do meteoro
+
+                    // Reduz a área de colisão do meteoro (bounce box menor)
+                    meteoro.body.setSize(meteoro.width * 0.6, meteoro.height * 0.6).setOffset(meteoro.width * 0.2, meteoro.height * 0.2);
+
+                    meteoro.setVelocityY(Phaser.Math.Between(150, 300)); // Velocidade do meteoro
+                }
+
+                // Quando um meteoro atinge o chão
+                meteorHitGround(meteor) {
+                    this.score++; // Aumenta a pontuação
+                    console.log("Meteoro atingiu o chão. Pontuação: " + this.score); // Mostra a pontuação no console
+                    meteor.destroy(); // Remove o meteoro
+                }
+
+                // Quando o jogador é atingido por um meteoro
+                hitMeteoro(player, meteoro) {
+                    this.physics.pause(); // Pausa o jogo
+                    player.setTint(0xff0000); // Muda a cor do jogador para vermelho
+                    player.anims.stop(); // Para a animação do jogador
+
+                    // Mostra a mensagem para reiniciar
+                    let restartText = this.add.text(larguraJogo / 2, alturaJogo / 2, " GAME OVER! aperte SHIFT para reiniciar", { font: "32px Arial", fill: "#fff" })
+                        .setOrigin(0.5);
+
+                    // Reinicia o jogo quando a tecla Shift é pressionada
+                    this.input.keyboard.once("keydown-SHIFT", () => {
+                        this.scene.restart(); // Reinicia a cena
+                        this.score = 0; // Zera a pontuação
+                    });
+                }
+            }
+
+            // Configurações do jogo
+            const configGame = {
+                type: Phaser.AUTO, // Tipo de renderização (automática)
+                width: larguraJogo, // Largura do jogo
+                height: alturaJogo, // Altura do jogo
+                physics: { default: "arcade", arcade: { gravity: { y: 500 }, debug: false } }, // Física do jogo
+                scene: [MenuScene, GameScene] // Cenas do jogo
+            };
+
+            // Inicia o jogo
+            const gameInstance = new Phaser.Game(configGame);
+        </script>
+    </body>
+</html>
