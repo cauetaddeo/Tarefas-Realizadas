@@ -88,10 +88,11 @@
                     this.player = this.physics.add.sprite(larguraJogo / 2, alturaJogo / 2, "player");
                     this.player.setCollideWorldBounds(true); // Impede que o jogador saia da tela
                     this.physics.add.collider(this.player, this.platforms); // Faz o jogador colidir com o chão
+                    this.scoreText.setDepth(1); // Coloca o texto na frente do jogo
 
                     // Pontuação
                     this.score = 0; // Inicia a pontuação em 0
-                    this.scoreText = this.add.text(16, 16, "Score: " + this.score, { font: "32px Arial", fill: "#fff" }); // Texto da pontuação
+                    this.scoreText = this.add.text(100, 100, "Score: " + this.score, { font: "32px Arial", fill: "#fff" }); // Texto da pontuação
 
                     // Animações do jogador
                     this.anims.create({
