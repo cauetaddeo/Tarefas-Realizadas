@@ -31,6 +31,10 @@ c) A saída será undefined seguido de undefined
 
 d) A saída será erro em ambas as linhas que utilizam console.log
 
+**Resposta: a) A saída será undefined seguido de erro**
+
+**Justificativa:** A variável x foi declarada com var, então existe, mas sem valor (undefined). Já y foi declarada com let, que não permite ser usada antes da sua declaração, causando erro.
+
 
 **2) O seguinte código JavaScript tem um erro que impede sua execução correta. Analise e indique a opção que melhor corrige o problema. Justifique sua resposta.**
 
@@ -51,6 +55,11 @@ b) Substituir if (a || b === 0) por if (a === 0 && b === 0)
 c) Substituir if (a || b === 0) por if (a && b === 0)
 
 d) Remover completamente a verificação if (a || b === 0)
+
+**Resposta: a) Substituir if (a || b === 0) por if (a === 0 || b === 0)**
+
+**Justificativa:** O código original verifica apenas um dos valores corretamente. A correção verifica se qualquer um dos dois é igual a zero.
+
 
 ______
 **3) Ao executar esse código, qual será a saída no console? Indique a alternativa correta e justifique sua resposta.**
@@ -85,6 +94,11 @@ c) O código imprime 50.
 
 d) O código gera um erro.
 
+**Resposta: b) O código imprime 200**
+
+**Justificativa:** Não tem a presença de um Break antes do case "vestuário", por isso imprime 200.
+
+
 ______
 **4) Ao executar esse código, qual será a saída no console? Indique a alternativa correta e justifique sua resposta.**
 ```javascript
@@ -101,6 +115,12 @@ b) 6
 c) 18
 
 d) 24
+
+**Resposta: d) 24**
+
+**Justificativa:** Multiplica todos os números por 2: [2, 4, 6, 8, 10], filtra os números maiores que 5: [6, 8, 10], soma esses valores: 6 + 8 + 10 = 24
+
+
 ______
 **5) Qual será o conteúdo do array lista após a execução do código? Indique a alternativa correta e justifique sua resposta.**
 
@@ -118,6 +138,12 @@ c) ["banana", "abacaxi", "manga", "laranja"]
 
 d) ["banana", "maçã", "uva", "abacaxi", "manga"]
 ______
+
+**Resposta: c) ["banana", "abacaxi", "manga", "laranja"]**
+
+**Justificativa:** O comando splice(1, 2, "abacaxi", "manga") remove maçã e uva e coloca abacaxi e manga no lugar.
+
+
 **6) Abaixo há duas afirmações sobre herança em JavaScript. Indique a alternativa correta e justifique sua resposta**
 
 I. A herança é utilizada para compartilhar métodos e propriedades entre classes em JavaScript, permitindo que uma classe herde os métodos de outra sem a necessidade de repetir código.  
@@ -132,6 +158,11 @@ c) A primeira afirmação é verdadeira, e a segunda é falsa.
 
 d) A primeira afirmação é falsa, e a segunda é verdadeira.
 ______
+
+**Resposta: a) As duas afirmações são verdadeiras, e a segunda justifica a primeira.**
+
+**Justificativa:** A herança evita repetição de código e, em JavaScript, acontece com extends.
+
 **7) Dado o seguinte código. Indique a alternativa correta e justifique sua resposta.**
 
 ```javascript
@@ -176,6 +207,11 @@ d) Apenas I é verdadeira.
 
 ______
 
+**Resposta: a) I e II são verdadeiras.**
+
+**Justificativa:** A classe Funcionario herda nome e idade de Pessoa e o método apresentar() da classe Funcionario chama o da classe Pessoa e adiciona mais informações.
+
+
 **8) Analise as afirmações a seguir. Indique a alternativa correta e justifique sua resposta.**
 
 **Asserção:** O conceito de polimorfismo em Programação Orientada a Objetos permite que objetos de diferentes tipos respondam à mesma mensagem de maneiras diferentes.  
@@ -191,6 +227,11 @@ d) A asserção é verdadeira e a razão é verdadeira, e a razão explica a ass
 
 ______
 
+**Resposta: b) A asserção é verdadeira e a razão é falsa.**
+
+**Justificativa:** O polimorfismo permite que o mesmo método funcione de formas diferentes em classes diferentes, mas JavaScript não permite sobrecarga de métodos como outras linguagens.
+
+
 # Questões dissertativas
 9) O seguinte código deve retornar a soma do dobro dos números de um array, mas contém erros. Identifique os problema e corrija o código para que funcione corretamente. Adicione comentários ao código explicado sua solução para cada problema.
 
@@ -205,9 +246,72 @@ function somaArray(numeros) {
 console.log(somaArray([1, 2, 3, 4]));
 ```
 ______
+**Código corrigido:** 
+```javascript
+function somaArray(numeros) {
+    let soma = 0;
+    for (let i = 0; i < numeros.length; i++) {
+        soma += 2 * numeros[i]; // Multiplica cada número por 2 e soma
+    }
+    return soma;
+}
+console.log(somaArray([1, 2, 3, 4])); // Resultado: 20
+```
+
+**Comentários:**
+
+- Inicia soma com 0
+- Isso garante que os valores somados sejam armazenados corretamente.
+- Percorre o array corretamente
+- Usa numeros.length para obter o tamanho do array.
+- Dobra e soma corretamente os números
+- soma += 2 * numeros[i]; multiplica cada número por 2 e adiciona ao total.
+- Retorna a soma total
+- No exemplo [1, 2, 3, 4], os valores dobrados são [2, 4, 6, 8], resultando em 20.
+
+
+
 10) Crie um exemplo prático no qual você tenha duas classes:
 
 - Uma classe `Produto` com atributos `nome` e `preco`, e um método `calcularDesconto()` que aplica um desconto fixo de 10% no preço do produto.
 - Uma classe `Livro` que herda de `Produto` e modifica o método `calcularDesconto()`, aplicando um desconto de 20% no preço dos livros.
 
 Explique como funciona a herança nesse contexto e como você implementaria a modificação do método na classe `Livro`.
+
+**Resposta:**
+```javascript
+class Produto {
+    constructor(nome, preco) {
+        this.nome = nome;
+        this.preco = preco;
+    }
+
+    calcularDesconto() {
+        return this.preco * 0.9; // 10% de desconto
+    }
+}
+
+class Livro extends Produto {
+    constructor(nome, preco, autor) {
+        super(nome, preco);
+        this.autor = autor;
+    }
+
+    calcularDesconto() {
+        return this.preco * 0.8; // 20% de desconto para livros
+    }
+}
+
+const produto = new Produto("Camiseta", 50);
+console.log(produto.calcularDesconto()); // 45
+
+const livro = new Livro("JavaScript Avançado", 100, "Autor X");
+console.log(livro.calcularDesconto()); // 80
+```
+
+**Explicação do código:** 
+Produto tem um método que aplica 10% de desconto.
+Livro herda de Produto, mas muda o método para aplicar 20%.
+Isso mostra polimorfismo, pois o método funciona diferente dependendo da classe.
+
+**O que é imprimido no console:** Os números 45 e 80
