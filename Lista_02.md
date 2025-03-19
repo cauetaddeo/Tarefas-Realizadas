@@ -49,6 +49,8 @@ C) O código avalia a expressão booleana, imprime `true` e, em seguida, verific
 
 D) O código avalia a expressão booleana, imprime `false` e ordena os valores em ordem crescente.
 
+**Resposta: A) O código avalia a expressão booleana, imprime true, calcula o produto dos números na lista e imprime o resultado no console.**
+
 
 ______
 
